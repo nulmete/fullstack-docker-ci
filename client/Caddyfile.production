@@ -1,0 +1,9 @@
+emprendapp.com.ar:443 {
+  tls nicoulmete1@gmail.com
+  root * /srv
+  route {
+    reverse_proxy /api* api-server:5000
+    try_files {path} {path}/ /index.html
+    file_server
+  }
+}

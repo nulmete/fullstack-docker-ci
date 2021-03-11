@@ -1,0 +1,33 @@
+### First stage
+FROM node:14-slim AS builder
+
+# working directory
+WORKDIR /usr/src/app
+
+# copy dependencies to workdir
+COPY ./package.json ./
+COPY ./package-lock.json ./
+
+# install dependencies
+RUN npm install
+
+# copy rest of source code
+COPY . .
+
+ARG BASE_URL
+ENV REACT_APP_BASE_URL=${BASE_URL}
+
+RUN npm run build
+
+### Copy into secondary Caddy stage
+FROM caddy:2.1.1-alpine
+
+ARG CADDYFILE
+COPY ${CADDYFILE} /etc/caddy/Caddyfile
+
+RUN ls
+
+COPY --from=builder /usr/src/app/build/ /srv
+
+EXPOSE 80
+EXPOSE 443
